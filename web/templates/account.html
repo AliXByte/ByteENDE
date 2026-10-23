@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Account{% endblock %}
+{% block header %}My account{% endblock %}
+{% block subheader %}<div class="sub">Manage the single owner login for this ByteENDE instance.</div>{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>{{ icon('user') }} Signed in as {{ user }}</h2>
+  <div class="desc">This is the only panel account. There is no self-registration — the owner account was created once, on first run.</div>
+</div>
+<div class="card">
+  <h2>{{ icon('user') }} Change username</h2>
+  <div class="desc">Your username is also your login name. Changing it signs you in under the new name immediately — your API keys and settings are unaffected.</div>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="form" value="username">
+    <div class="field"><label>New username</label><input type="text" name="new_username" minlength="3" maxlength="24" value="{{ user }}" required autocomplete="username"></div>
+    <div class="field"><label>Current password</label>
+      <div class="pw-wrap">
+        <input type="password" name="current_for_username" id="curPwUsername" required autocomplete="current-password">
+        <button type="button" class="pw-toggle" data-for="curPwUsername" title="Show password">{{ icon('eye') }}</button>
+      </div>
+      <div class="help">Confirms it's really you before the login name changes.</div>
+    </div>
+    {% if name_error %}<div class="err">{{ name_error }}</div>{% endif %}
+    {% if name_ok %}<div class="ok-msg">{{ name_ok }}</div>{% endif %}
+    <button class="btn primary" type="submit">Update username</button>
+  </form>
+</div>
+<div class="card">
+  <h2>{{ icon('shield') }} Change password</h2>
+  <div class="desc">Changing your password immediately invalidates the old one. It does not affect your API keys.</div>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="form" value="password">
+    <div class="field"><label>Current password</label>
+      <div class="pw-wrap">
+        <input type="password" name="current" id="curPwChange" required autocomplete="current-password">
+        <button type="button" class="pw-toggle" data-for="curPwChange" title="Show password">{{ icon('eye') }}</button>
+      </div>
+    </div>
+    <div class="field"><label>New password</label>
+      <div class="pw-wrap">
+        <input type="password" name="new" id="newPwChange" required minlength="8" autocomplete="new-password">
+        <button type="button" class="pw-toggle" data-for="newPwChange" title="Show password">{{ icon('eye') }}</button>
+      </div>
+      <div class="help">At least 8 characters.</div>
+    </div>
+    {% if error %}<div class="err">{{ error }}</div>{% endif %}
+    {% if ok %}<div class="ok-msg">{{ ok }}</div>{% endif %}
+    <button class="btn primary" type="submit">Update password</button>
+  </form>
+</div>
+{% endblock %}

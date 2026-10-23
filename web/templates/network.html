@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Network{% endblock %}
+{% block header %}Network{% endblock %}
+{% block subheader %}<div class="sub">Control which clients can reach ByteENDE, which address it listens on, and see who did what.</div>{% endblock %}
+{% block content %}
+
+{% if net_ok %}<div class="card accent-card"><div class="ok-msg" style="margin:0">{{ icon('check') }} {{ net_ok }}</div></div>{% endif %}
+{% if bad_lines %}<div class="card" style="border-color:rgba(251,113,133,.4)"><div class="err" style="margin:0">Couldn't save — these lines aren't valid: <code>{{ bad_lines|join(', ') }}</code></div></div>{% endif %}
+
+<div class="card">
+  <div class="desc" style="margin-bottom:0"><b>Your current connection:</b> <span class="pill c mono">{{ current_ip }}</span> — this address (and localhost) can always reach the login screen and this Network page, so a misconfigured rule can never permanently lock you out of the machine ByteENDE runs on.</div>
+</div>
+
+<div class="card">
+  <h2>{{ icon('layout') }} Dashboard access</h2>
+  <div class="desc">Restrict which IP addresses may use the web panel (everything except this Network page and the login screen).</div>
+  <form method="post" action="{{ url_for('panel_routes.network_update') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="form" value="dashboard_acl">
+    <div class="seg" style="margin-bottom:12px">
+      <button type="button" data-radio="dash_mode" data-value="allow_all" class="{{ 'on' if net.dashboard.mode=='allow_all' }}">Allow all</button>
+      <button type="button" data-radio="dash_mode" data-value="allowlist" class="{{ 'on' if net.dashboard.mode=='allowlist' }}">Allow only these</button>
+      <button type="button" data-radio="dash_mode" data-value="blocklist" class="{{ 'on' if net.dashboard.mode=='blocklist' }}">Block these</button>
+    </div>
+    <input type="hidden" name="mode" id="dash_mode_input" value="{{ net.dashboard.mode }}">
+    <div class="field"><label>IP addresses / CIDR ranges — one per line</label>
+      <textarea name="rules" rows="4" placeholder="203.0.113.10&#10;10.0.0.0/24">{{ dashboard_rules_text }}</textarea>
+      <div class="help">Ignored while mode is "Allow all". Supports single IPs and CIDR ranges (e.g. 192.168.1.0/24).</div>
+    </div>
+    <button class="btn primary" type="submit">Save dashboard rules</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>{{ icon('globe') }} API access</h2>
+  <div class="desc">Restrict which IP addresses may call <code>/api/v1/*</code> — independent from the dashboard rule above, since scripts and the browser usually come from different places.</div>
+  <form method="post" action="{{ url_for('panel_routes.network_update') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="form" value="api_acl">
+    <div class="seg" style="margin-bottom:12px">
+      <button type="button" data-radio="api_mode" data-value="allow_all" class="{{ 'on' if net.api.mode=='allow_all' }}">Allow all</button>
+      <button type="button" data-radio="api_mode" data-value="allowlist" class="{{ 'on' if net.api.mode=='allowlist' }}">Allow only these</button>
+      <button type="button" data-radio="api_mode" data-value="blocklist" class="{{ 'on' if net.api.mode=='blocklist' }}">Block these</button>
+    </div>
+    <input type="hidden" name="mode" id="api_mode_input" value="{{ net.api.mode }}">
+    <div class="field"><label>IP addresses / CIDR ranges — one per line</label>
+      <textarea name="rules" rows="4" placeholder="203.0.113.10&#10;10.0.0.0/24">{{ api_rules_text }}</textarea>
+      <div class="help">Ignored while mode is "Allow all". API keys still need their own scope and rate limit regardless of this rule.</div>
+    </div>
+    <button class="btn primary" type="submit">Save API rules</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>{{ icon('device') }} Device (MAC address) access</h2>
+  <div class="desc" style="color:var(--warn)">Honest limitation, read before enabling: a MAC address is only visible between devices on the <b>same local network</b>. ByteENDE can match it (Linux hosts only, via the system ARP table) for a device on your LAN, but it can <b>never</b> see the MAC address of a client connecting over the internet or through a router — for remote access control, use the IP rules above instead. When this is on, any request that isn't one of your local network's allowed MACs is denied.</div>
+  <form method="post" action="{{ url_for('panel_routes.network_update') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="form" value="mac_acl">
+    <div class="switchrow" style="border:0;padding:4px 2px 14px">
+      <div><b>Enable MAC filtering</b><div class="help">Local network devices only — see the note above.</div></div>
+      <label class="switch"><input type="checkbox" name="enabled" {{ 'checked' if net.mac.enabled }}><span></span></label>
+    </div>
+    <div class="field"><label>Allowed MAC addresses — one per line</label>
+      <textarea name="rules" rows="3" placeholder="aa:bb:cc:dd:ee:ff" class="font-sans" style="font-family:var(--mono)">{{ mac_rules_text }}</textarea>
+    </div>
+    <button class="btn primary" type="submit">Save device rules</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>{{ icon('bolt') }} Listen address</h2>
+  <div class="desc">Which network interface the ByteENDE process binds to. Takes effect the next time you start it (<code>run.sh</code> / <code>run.bat</code> / <code>python run.py</code>) — it can't be changed on a process that's already running.</div>
+  <form method="post" action="{{ url_for('panel_routes.network_update') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="form" value="bind_host">
+    {% set is_custom = net.bind_host not in ['127.0.0.1', '0.0.0.0'] %}
+    <div class="seg" style="margin-bottom:12px">
+      <button type="button" data-radio="bind_choice" data-value="127.0.0.1" class="{{ 'on' if net.bind_host=='127.0.0.1' }}">This machine only (127.0.0.1)</button>
+      <button type="button" data-radio="bind_choice" data-value="0.0.0.0" class="{{ 'on' if net.bind_host=='0.0.0.0' }}">All network interfaces (0.0.0.0)</button>
+      <button type="button" data-radio="bind_choice" data-value="custom" class="{{ 'on' if is_custom }}">Custom</button>
+    </div>
+    <input type="hidden" name="bind_choice" id="bind_choice_input" value="{{ 'custom' if is_custom else net.bind_host }}">
+    <div class="field" style="max-width:320px"><label>Custom address</label><input type="text" name="bind_custom" value="{{ net.bind_host if is_custom else '' }}" placeholder="e.g. 192.168.1.50"></div>
+    <div class="hint" style="margin-bottom:12px">0.0.0.0 exposes ByteENDE to every network interface on this machine — only use it behind a firewall, VPN, or reverse proxy with TLS, and pair it with the IP rules above.</div>
+    <button class="btn primary" type="submit">Save listen address</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>{{ icon('list') }} Access log</h2>
+  <div class="desc">Every request ByteENDE has handled recently: who (IP), what (method + path), and the outcome. Kept locally in <code>data/access_log.jsonl</code>, capped automatically.</div>
+  {% if events %}
+  <div style="max-height:420px;overflow:auto;border:1px solid var(--border);border-radius:10px">
+  <table>
+    <thead><tr><th>Time</th><th>IP</th><th>Method</th><th>Path</th><th>User</th><th>Result</th></tr></thead>
+    <tbody>
+      {% for e in events %}
+      <tr>
+        <td class="mono" style="white-space:nowrap">{{ e.time_str }}</td>
+        <td class="mono">{{ e.ip }}</td>
+        <td>{{ e.method }}</td>
+        <td class="mono" style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.path }}</td>
+        <td>{{ e.user or '—' }}</td>
+        <td>
+          {% if e.result == 'blocked' %}<span class="pill r">{{ icon('ban') }} blocked ({{ e.reason }})</span>
+          {% elif e.result == 'error' %}<span class="pill r">{{ e.status }}</span>
+          {% else %}<span class="pill g">{{ e.status }}</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}
+  <div class="desc">No activity recorded yet.</div>
+  {% endif %}
+  <form method="post" action="{{ url_for('panel_routes.network_logs_clear') }}" data-confirm="Clear the entire access log? This cannot be undone." style="margin-top:14px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button class="btn sm danger icon-btn" type="submit">{{ icon('trash') }} Clear log</button>
+  </form>
+</div>
+
+{% endblock %}

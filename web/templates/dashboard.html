@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Tools{% endblock %}
+{% block header %}Tools{% endblock %}
+{% block subheader %}<div class="sub"><span class="badge-live">Running locally</span> &nbsp;·&nbsp; every result below also works the same way from the REST API</div>{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2>{{ icon('codec') }} Encode / Decode</h2>
+  <div class="desc">Turn text into one of these representations, or turn it back. Pick a format, type or paste your text, then choose Encode or Decode.</div>
+  <div class="tabs" id="codecTabs">
+    <button data-c="base64" class="on">Base64</button>
+    <button data-c="base32">Base32</button>
+    <button data-c="hex">Hex</button>
+    <button data-c="binary">Binary</button>
+    <button data-c="url">URL</button>
+    <button data-c="rot13">ROT13</button>
+    <button data-c="morse">Morse</button>
+  </div>
+  <div class="row2">
+    <div class="field"><label>Input</label><textarea id="codecIn" rows="5" placeholder="Type or paste text..."></textarea></div>
+    <div class="field"><label>Result <span id="codecModeLbl" class="pill c">encode</span></label>
+      <div class="out-box" id="codecOut">—<button class="copy" data-copy-target="codecOut" title="Copy">{{ icon('copy') }}</button></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:10px">
+    <button class="btn primary" id="codecEncode">Encode →</button>
+    <button class="btn" id="codecDecode">← Decode</button>
+  </div>
+  <div class="hint" id="codecErr"></div>
+</div>
+
+<div class="card">
+  <h2>{{ icon('hash') }} Hash generator</h2>
+  <div class="desc">Produces a one-way fingerprint of your text with MD5, SHA-1, SHA-256 and SHA-512 at once. Hashing cannot be reversed — use it to verify integrity or compare values, not to "decode" anything.</div>
+  <div class="field"><label>Input</label><textarea id="hashIn" rows="3" placeholder="Text to hash..."></textarea></div>
+  <button class="btn primary" id="hashRun" style="margin-top:8px">Generate hashes</button>
+  <div id="hashOut" style="margin-top:14px"></div>
+</div>
+
+<div class="card">
+  <h2>{{ icon('jwt') }} JWT</h2>
+  <div class="desc">Inspect a JSON Web Token's header and payload (no secret needed), or build and sign a new one with HS256/384/512.</div>
+  <div class="tabs" id="jwtTabs"><button data-j="decode" class="on">Decode</button><button data-j="encode">Encode</button></div>
+  <div id="jwtDecodeBox">
+    <div class="field"><label>Token</label><textarea id="jwtToken" rows="3" placeholder="eyJhbGciOi..."></textarea></div>
+    <div class="hint">Decoding only reads the header and payload — it does not check the signature. Use the API's /jwt/verify if you need that.</div>
+    <button class="btn primary" id="jwtDecodeRun" style="margin-top:8px">Decode</button>
+    <div class="out-box" id="jwtOut" style="margin-top:12px">—</div>
+  </div>
+  <div id="jwtEncodeBox" style="display:none">
+    <div class="row2">
+      <div class="field"><label>Payload (JSON)</label><textarea id="jwtPayload" rows="4">{"sub":"user123","role":"user"}</textarea></div>
+      <div class="field"><label>Secret</label><input id="jwtSecret" placeholder="your-secret-key" type="password">
+        <label style="margin-top:10px;display:block">Algorithm</label>
+        <select id="jwtAlg"><option>HS256</option><option>HS384</option><option>HS512</option></select>
+      </div>
+    </div>
+    <button class="btn primary" id="jwtEncodeRun" style="margin-top:8px">Encode</button>
+    <div class="out-box" id="jwtEncOut" style="margin-top:12px">—<button class="copy" data-copy-target="jwtEncOut" title="Copy">{{ icon('copy') }}</button></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>{{ icon('lock') }} AES-256-GCM encryption</h2>
+  <div class="desc">Authenticated encryption: your password is run through PBKDF2 (200,000 rounds) to derive a key, so a tampered or wrong-password ciphertext fails to decrypt instead of silently returning garbage. The result is a single portable Base64 blob — keep the password safe, it is never stored.</div>
+  <div class="tabs" id="aesTabs"><button data-a="encrypt" class="on">Encrypt</button><button data-a="decrypt">Decrypt</button></div>
+  <div class="field"><label id="aesInLbl">Text to encrypt</label><textarea id="aesIn" rows="3" placeholder="Your secret text..."></textarea></div>
+  <div class="field" style="margin-top:10px"><label>Password</label><input id="aesPass" type="password" placeholder="A strong, memorable password"></div>
+  <button class="btn primary" id="aesRun" style="margin-top:8px">Run</button>
+  <div class="out-box" id="aesOut" style="margin-top:12px">—<button class="copy" data-copy-target="aesOut" title="Copy">{{ icon('copy') }}</button></div>
+</div>
+
+<div class="card">
+  <h2>{{ icon('qr') }} QR code</h2>
+  <div class="desc">Generate a scannable QR for any text or URL, or read one back from an uploaded image.</div>
+  <div class="tabs" id="qrTabs"><button data-q="gen" class="on">Generate</button><button data-q="read">Read</button></div>
+  <div id="qrGenBox">
+    <div class="field"><label>Text / URL</label><input id="qrText" placeholder="https://..."></div>
+    <button class="btn primary" id="qrGenRun" style="margin-top:8px">Generate QR</button>
+    <div id="qrImgOut" style="margin-top:14px"></div>
+  </div>
+  <div id="qrReadBox" style="display:none">
+    <div class="drop" id="qrDrop">{{ icon('upload') }}<div>Click or drop a QR image here</div></div>
+    <input type="file" id="qrFile" accept="image/*" style="display:none">
+    <div class="out-box" id="qrReadOut" style="margin-top:12px">—</div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,5 @@
+Flask>=3.0
+cryptography>=42.0
+qrcode>=7.4
+Pillow>=10.0
+pyzbar>=0.1.9

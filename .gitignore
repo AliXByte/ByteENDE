@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+data/owner.json
+data/keys.json
+data/session.secret
+data/network.json
+data/access_log.jsonl
+venv/
+.venv/

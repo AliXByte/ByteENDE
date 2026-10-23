@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script>
+/* Applied before first paint to avoid a flash of default theme when the
+   visitor has already customized ByteENDE (see /settings). */
+(function(){
+  try {
+    var p = JSON.parse(localStorage.getItem('byteende:prefs') || '{}');
+    var html = document.documentElement;
+    if (p.accent) html.setAttribute('data-accent', p.accent);
+    if (p.density) html.setAttribute('data-density', p.density);
+    if (p.bgEffects === false) html.setAttribute('data-fx', 'off');
+    if (p.animations === false) html.setAttribute('data-anim', 'off');
+  } catch (e) {}
+})();
+</script>
+<title>ByteENDE · {% block title %}Dashboard{% endblock %}</title>
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head><body>
+{% from "_icons.html" import icon %}
+<div class="bg-fx"><i></i><i></i><i></i></div>
+<div class="shell">
+  <aside class="side" id="sideNav">
+    <div class="brandrow">
+      <div class="mark"><img src="{{ url_for('static', filename='logo.png') }}" alt="AliXByte logo"></div>
+      <div><strong>ByteENDE</strong><span>Multi-protocol encode / decode toolbox</span></div>
+    </div>
+    <nav class="nav">
+      <div class="navlabel">Workspace</div>
+      <a href="{{ url_for('panel_routes.dashboard') }}" class="{{ 'active' if active=='dashboard' else '' }}">{{ icon('tools') }} Tools</a>
+      <a href="{{ url_for('panel_routes.keys_page') }}" class="{{ 'active' if active=='keys' else '' }}">{{ icon('key') }} API keys</a>
+      <a href="{{ url_for('panel_routes.network_page') }}" class="{{ 'active' if active=='network' else '' }}">{{ icon('network') }} Network</a>
+      <div class="navlabel">Preferences</div>
+      <a href="{{ url_for('panel_routes.settings_page') }}" class="{{ 'active' if active=='settings' else '' }}">{{ icon('settings') }} Customize</a>
+      <a href="{{ url_for('auth_routes.account') }}" class="{{ 'active' if active=='account' else '' }}">{{ icon('user') }} Account</a>
+    </nav>
+    <div class="foot">
+      Signed in as <b>{{ user or '' }}</b><br>
+      <a href="{{ url_for('auth_routes.logout') }}" class="footlink">{{ icon('logout') }} Sign out</a>
+      <div class="credit">
+        {{ icon('github') }}
+        <a href="{{ author_url }}" target="_blank" rel="noopener">{{ author }}</a>
+      </div>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="navtoggle" id="navToggle" aria-label="Menu">{{ icon('menu') }}</button>
+      <div><h1>{% block header %}{% endblock %}</h1>{% block subheader %}{% endblock %}</div>
+      <div class="grow"></div>
+    </div>
+    <div class="content">{% block content %}{% endblock %}</div>
+  </div>
+</div>
+<div class="toast-stack" id="toastStack"></div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body></html>

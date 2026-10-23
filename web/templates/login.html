@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ByteENDE · Sign in</title>
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head><body>
+{% from "_icons.html" import icon %}
+<div class="bg-fx"><i></i><i></i><i></i></div>
+<div class="auth-wrap"><div class="auth-card">
+  <div class="brand">
+    <div class="mark"><img src="{{ url_for('static', filename='logo.png') }}" alt="AliXByte logo"></div>
+    <h1>ByteENDE</h1>
+    <span>Encode · Decode · Hash · JWT · AES · QR<br>by <a href="{{ author_url }}" target="_blank" rel="noopener">{{ author }}</a></span>
+  </div>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="field"><label>Username</label><input name="username" maxlength="24" required autofocus autocomplete="username"></div>
+    <div class="field">
+      <label>Password</label>
+      <div class="pw-wrap">
+        <input name="password" id="loginPassword" type="password" maxlength="64" required autocomplete="current-password">
+        <button type="button" class="pw-toggle" data-for="loginPassword" title="Show password">{{ icon('eye') }}</button>
+      </div>
+    </div>
+    <div class="err">{{ error or '' }}</div>
+    <button class="btn primary block" type="submit">Sign in</button>
+  </form>
+</div></div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body></html>

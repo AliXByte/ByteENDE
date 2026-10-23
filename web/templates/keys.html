@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}API keys{% endblock %}
+{% block header %}API keys{% endblock %}
+{% block subheader %}<div class="sub">Issue scoped, rate-limited tokens so scripts and services can call the REST API without your login.</div>{% endblock %}
+{% block content %}
+
+{% if new_token %}
+<div class="card accent-card">
+  <h2>{{ icon('key') }} New key created</h2>
+  <div class="desc">Copy it now — for your security it is stored only as a hash and is <b>never shown again</b> after you leave this page.</div>
+  <div class="token-box" id="newTokenBox">{{ new_token }}<button class="copy" data-copy-target="newTokenBox" title="Copy">{{ icon('copy') }}</button></div>
+</div>
+{% endif %}
+
+<div class="card">
+  <h2>{{ icon('plus') }} Create a new key</h2>
+  <div class="desc">A key can only call the tool groups ("scopes") you grant it, and is capped at a requests-per-minute limit you set — so a leaked key for one integration can't be used to drain every tool, or hammer the server.</div>
+  <form method="post" action="{{ url_for('panel_routes.keys_create') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="field"><label>Name</label><input name="name" maxlength="40" placeholder="e.g. my-deploy-script" required>
+      <div class="help">A label to help you recognize this key later — not a secret.</div>
+    </div>
+    <label style="font-size:12.5px;color:var(--muted);display:block;margin:12px 0 4px;font-weight:600">Scopes — which tool groups this key may call</label>
+    <div class="checks">
+      {% for s in scopes %}
+      <label><input type="checkbox" name="scopes" value="{{ s }}" checked><span class="scope-check">{{ icon('check', cls='') }}</span>{{ s }}</label>
+      {% endfor %}
+    </div>
+    <div class="field" style="max-width:260px"><label>Requests per minute</label><input type="number" name="rate" value="30" min="1" max="1000">
+      <div class="help">Sliding 60-second window, enforced per key.</div>
+    </div>
+    <button class="btn primary" type="submit" style="margin-top:10px">{{ icon('plus') }} Create key</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>{{ icon('key') }} Existing keys</h2>
+  {% if not keys %}<div class="desc">No API keys yet — create one above to start calling /api/v1/*.</div>{% endif %}
+  {% if keys %}
+  <table>
+    <thead><tr><th>Name</th><th>Prefix</th><th>Scopes</th><th>Rate</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for k in keys %}
+      <tr>
+        <td><b>{{ k.name }}</b></td>
+        <td><span class="pill c mono">{{ k.prefix }}…</span></td>
+        <td>{% for s in k.scopes %}<span class="chip">{{ s }}</span>{% endfor %}</td>
+        <td>{{ k.rate }}/min</td>
+        <td>{% if k.enabled %}<span class="pill g">active</span>{% else %}<span class="pill r">disabled</span>{% endif %}</td>
+        <td style="white-space:nowrap">
+          <form method="post" action="{{ url_for('panel_routes.keys_toggle', key_id=k.id) }}" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="btn sm icon-btn" type="submit" title="{{ 'Disable' if k.enabled else 'Enable' }}">{{ icon('power') }} {{ 'Disable' if k.enabled else 'Enable' }}</button>
+          </form>
+          <form method="post" action="{{ url_for('panel_routes.keys_delete', key_id=k.id) }}" style="display:inline" data-confirm="Delete this key? This cannot be undone.">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="btn sm danger icon-btn" type="submit" title="Delete">{{ icon('trash') }} Delete</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>{{ icon('bolt') }} How to call the API</h2>
+  <div class="desc">Send the token as a Bearer header. Every call must match the key's scope and stay under its per-minute limit, or you'll get a 403 / 429.</div>
+  <div class="out-box">curl -X POST {{ request.host_url }}api/v1/codec \
+  -H "Authorization: Bearer &lt;TOKEN&gt;" \
+  -H "Content-Type: application/json" \
+  -d '{"codec":"base64","mode":"encode","text":"hello"}'</div>
+  <p class="hint" style="margin-top:10px">Endpoints: /api/v1/codec · /api/v1/hash · /api/v1/jwt/decode · /api/v1/jwt/encode · /api/v1/jwt/verify · /api/v1/aes/encrypt · /api/v1/aes/decrypt · /api/v1/qr/generate · /api/v1/qr/read · /api/v1/ping</p>
+</div>
+
+{% endblock %}

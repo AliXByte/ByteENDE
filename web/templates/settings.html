@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Customize{% endblock %}
+{% block header %}Customize{% endblock %}
+{% block subheader %}<div class="sub">Every option below applies instantly and is remembered on this device — nothing is sent to the server.</div>{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2>{{ icon('palette') }} Accent color</h2>
+  <div class="desc">Pick the accent used for buttons, highlights and the active nav item. Cyan matches the AliXByte brand mark.</div>
+  <div class="swatches" id="accentSwatches">
+    <button class="swatch" data-accent="cyan" style="--sw1:#22d3ee;--sw2:#0ea5e9"><span></span>Cyan</button>
+    <button class="swatch" data-accent="violet" style="--sw1:#a78bfa;--sw2:#7c3aed"><span></span>Violet</button>
+    <button class="swatch" data-accent="emerald" style="--sw1:#34d399;--sw2:#059669"><span></span>Emerald</button>
+    <button class="swatch" data-accent="amber" style="--sw1:#fbbf24;--sw2:#d97706"><span></span>Amber</button>
+    <button class="swatch" data-accent="rose" style="--sw1:#fb7185;--sw2:#e11d48"><span></span>Rose</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2>{{ icon('layout') }} Layout & density</h2>
+  <div class="desc">Fit more on screen, or give every panel more breathing room.</div>
+  <div class="seg" id="densitySeg">
+    <button data-density="comfortable" class="on">Comfortable</button>
+    <button data-density="compact">Compact</button>
+  </div>
+  <div class="field" style="margin-top:16px;max-width:360px">
+    <label>Default Encode / Decode format</label>
+    <select id="defaultCodecSel">
+      <option value="base64">Base64</option>
+      <option value="base32">Base32</option>
+      <option value="hex">Hex</option>
+      <option value="binary">Binary</option>
+      <option value="url">URL</option>
+      <option value="rot13">ROT13</option>
+      <option value="morse">Morse</option>
+    </select>
+    <div class="help">Which tab is selected by default when you open the Tools page.</div>
+  </div>
+  <div class="field" style="margin-top:14px;max-width:360px">
+    <label>Result box font</label>
+    <select id="outputFontSel">
+      <option value="mono">Monospace (default)</option>
+      <option value="sans">Same font as the UI</option>
+    </select>
+  </div>
+</div>
+
+<div class="card">
+  <h2>{{ icon('bolt') }} Motion & effects</h2>
+  <div class="desc">ByteENDE's background glow, card hover glow and loading spinners are all cosmetic — turn them off for a flatter, faster interface.</div>
+  <div class="switchrow"><div><b>Animated background</b><div class="help">The drifting glow and grid behind every page.</div></div><label class="switch"><input type="checkbox" id="bgFxToggle" checked><span></span></label></div>
+  <div class="switchrow"><div><b>Transitions & pulse effects</b><div class="help">Hover glow, fade-ins, the live-status pulse, token-box glow.</div></div><label class="switch"><input type="checkbox" id="animToggle" checked><span></span></label></div>
+</div>
+
+<div class="card">
+  <h2>{{ icon('confirm') }} Behavior</h2>
+  <div class="switchrow"><div><b>Confirm before deleting an API key</b><div class="help">Shows a confirmation dialog instead of deleting immediately.</div></div><label class="switch"><input type="checkbox" id="confirmDeleteToggle" checked><span></span></label></div>
+  <div class="switchrow"><div><b>Toast notification on copy</b><div class="help">Shows a small confirmation when you copy a result to the clipboard.</div></div><label class="switch"><input type="checkbox" id="copyToastToggle" checked><span></span></label></div>
+</div>
+
+<div class="card">
+  <h2>{{ icon('settings') }} Backup your preferences</h2>
+  <div class="desc">These settings live only in this browser. Export them to move your setup to another device, or import a file someone shared with you.</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn" id="exportPrefsBtn">{{ icon('download') }} Export settings</button>
+    <button class="btn" id="importPrefsBtn">{{ icon('upload') }} Import settings</button>
+    <input type="file" id="importPrefsFile" accept="application/json" style="display:none">
+    <button class="btn danger" id="resetPrefsBtn">{{ icon('reset') }} Reset to defaults</button>
+  </div>
+</div>
+
+{% endblock %}
