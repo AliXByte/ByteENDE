@@ -1,13 +1,38 @@
-# ByteENDE
+<p align="center">
+  <img src="docs/screenshots/dashboard.png" alt="ByteENDE dashboard" width="800">
+</p>
 
-**Version 1.0.0** · **License: MIT** · **Author: [AliXByte](https://github.com/AliXByte)**
+<h1 align="center">ByteENDE</h1>
 
-A multi-protocol encode/decode toolbox with two interfaces built on one shared core: a dashboard to use by hand, and a REST API for everything else.
+<p align="center">
+  A self-hosted encode/decode, hashing &amp; crypto toolbox — one dashboard to use by hand, one REST API for everything else.
+</p>
 
-- **Web panel** — a navy/cyan dashboard (matching the AliXByte brand mark) to run every tool by hand, plus API-key management and a full Customize page.
-- **REST API** — secured with per-key Bearer tokens, scopes and per-key rate limiting.
+<p align="center">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-4fd1ff?style=flat-square">
+  <img alt="Python" src="https://img.shields.io/badge/python-3.9%2B-4fd1ff?style=flat-square">
+  <img alt="Flask" src="https://img.shields.io/badge/flask-3.x-4fd1ff?style=flat-square">
+  <img alt="Platform" src="https://img.shields.io/badge/platform-linux%20%7C%20macos%20%7C%20windows-4fd1ff?style=flat-square">
+  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-4fd1ff?style=flat-square">
+</p>
+
+Most "online tool" sites are a privacy problem: you paste a secret, a password hash, or a token into some stranger's server and hope for the best. ByteENDE is the self-hosted alternative — spin it up on your own machine or a box you control, and get a polished dashboard **and** a REST API for the encoding, hashing, JWT and crypto work you'd otherwise hand to a random website.
+
+- **Web panel** — a navy/cyan dashboard (matching the AliXByte brand mark) to run every tool by hand, plus API-key management, a Network access-control page, and a full Customize page.
+- **REST API** — secured with per-key Bearer tokens, scopes and per-key rate limiting, so scripts and CI jobs can use it without touching your login.
+- **Locked down by default** — CSRF protection, login lockout, per-IP/MAC access rules, security headers and a full audit log, out of the box.
 
 Cross-platform by design: pure-stdlib core logic, `os.path`-only file handling, and dedicated launchers for Linux/macOS (`run.sh`) and Windows (`run.bat`).
+
+## Screenshots
+
+| Tools dashboard | API keys |
+|---|---|
+| ![Dashboard](docs/screenshots/dashboard.png) | ![API keys](docs/screenshots/api-keys.png) |
+
+| Network access control | Customize |
+|---|---|
+| ![Network](docs/screenshots/network.png) | ![Customize](docs/screenshots/customize.png) |
 
 ## Table of contents
 
