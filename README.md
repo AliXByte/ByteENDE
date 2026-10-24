@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <img alt="CI" src="https://github.com/AliXByte/ByteENDE/actions/workflows/ci.yml/badge.svg">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-4fd1ff?style=flat-square">
   <img alt="Python" src="https://img.shields.io/badge/python-3.9%2B-4fd1ff?style=flat-square">
   <img alt="Flask" src="https://img.shields.io/badge/flask-3.x-4fd1ff?style=flat-square">
